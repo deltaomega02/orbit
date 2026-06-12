@@ -1,0 +1,11 @@
+
+# 가상환경 세팅
+
+# 작업폴더로 이동
+source /home/orbit_project/orbitserver/bin/activate
+cd /home/orbit_project/orbit_backend
+
+nohup python manage.py runserver 0.0.0.0:8000 & 
+
+
+/home/orbit_project/orbit_backend/accounts/views.py

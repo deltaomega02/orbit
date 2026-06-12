@@ -1,0 +1,55 @@
+{
+  "expo": {
+    "name": "Orbit",
+    "slug": "orbit-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./src/assets/images/icon.png",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "image": "./src/assets/images/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#1A1A1A"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.deltaomega.orbit",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Orbit needs access to your camera to photograph clothing items and take outfit photos.",
+        "NSPhotoLibraryUsageDescription": "Orbit needs access to your photo library to select clothing images."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./src/assets/images/adaptive-icon.png",
+        "backgroundColor": "#1A1A1A"
+      },
+      "package": "com.deltaomega.orbit",
+      "permissions": [
+        "CAMERA",
+        "android.permission.CAMERA"
+      ]
+    },
+    "web": {
+      "favicon": "./src/assets/images/favicon.png"
+    },
+    "plugins": [
+      [
+        "react-native-vision-camera",
+        {
+          "cameraPermissionText": "Orbit needs access to your camera to photograph clothing items and take outfit photos.",
+          "enableMicrophonePermission": false
+        }
+      ],
+      "expo-dev-client"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "fa6c08db-6a26-4aad-8ec9-e2751358c978"
+      }
+    }
+  }
+}
