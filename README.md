@@ -2,6 +2,17 @@
 
 AI 기반 패션 코디네이션 및 가상 착용 시뮬레이터를 제공하는 모바일 애플리케이션입니다. 사용자의 옷장을 디지털화하고, 날씨와 일정 데이터를 분석하여 최적의 코디를 추천합니다. Google Gemini AI를 활용한 의류 상세 분석, 스타일 추천, 가상 착용 이미지 생성 기능을 통해 개인 맞춤형 패션 경험을 제공합니다.
 
+## Screenshots
+
+| 홈 (날씨·일정 기반 추천) | AI 추천 상세 | 가상 착용 결과 |
+|:---:|:---:|:---:|
+| <img src="docs/screenshots/01-home.jpg" width="240"> | <img src="docs/screenshots/03-ai-recommend-detail.jpg" width="240"> | <img src="docs/screenshots/05-tryon-result.jpg" width="240"> |
+| **홈 — 데일리 룩 카드** | **코디 상세 (가상 착용)** | **스타일 로그** |
+| <img src="docs/screenshots/02-home-daily-card.jpg" width="240"> | <img src="docs/screenshots/04-coordination-tryon.jpg" width="240"> | <img src="docs/screenshots/06-style-log.jpg" width="240"> |
+
+가상 착용 이미지는 사용자의 전신 사진과 옷장 속 실제 의류를 Gemini 이미지 생성 모델로 합성한 결과물입니다.
+캡스톤디자인 결과보고서(발표자료)는 [`docs/`](docs/)에 있습니다.
+
 ## Table of Contents
 
 - [Tech Stack](#tech-stack)
