@@ -1,0 +1,8 @@
+Django>=5.2,<5.3
+djangorestframework
+djangorestframework-simplejwt
+django-cors-headers
+python-dotenv
+google-genai
+Pillow
+mysqlclient
