@@ -1,6 +1,6 @@
 # accounts/gemini_outfit_service.py
-# Gemini 3.0 Flash (High Thinking Mode)를 사용한 AI 코디 추천 서비스
-# v5.7: v5.4(2.5 Pro)와 100% 기능 동일성 확보 + Gemini 3.0 엔진 최적화
+# Gemini 2.5 Pro (High Thinking Mode)를 사용한 AI 코디 추천 서비스
+# v5.4: v4.0과 100% 기능 동일성 확보 + Gemini 2.5 Pro 엔진 최적화
 
 import os
 # [중요] 최신 google-genai SDK 사용 및 타입 시스템 활용
@@ -18,9 +18,9 @@ GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
 
 class GeminiOutfitRecommender:
     """
-    Gemini 3.0 Flash를 사용하여 사용자의 옷장에서
+    Gemini 2.5 Pro를 사용하여 사용자의 옷장에서
     날씨, 일정, 성별에 맞는 최적의 코디를 추천하는 서비스.
-    Thinking Level: HIGH 설정을 통해 2.5 Pro 이상의 스타일링 지능을 발휘합니다.
+    Thinking Level: HIGH 설정을 통해 높은 수준의 스타일링 지능을 발휘합니다.
     """
     
     def __init__(self):
@@ -28,7 +28,7 @@ class GeminiOutfitRecommender:
         if GEMINI_API_KEY:
             try:
                 self.client = genai.Client(api_key=GEMINI_API_KEY)
-                logger.info("Gemini 3.0 Flash Outfit Client initialized")
+                logger.info("Gemini 2.5 Pro Outfit Client initialized")
             except Exception as e:
                 logger.error(f"Failed to initialize Gemini Client: {str(e)}")
                 self.client = None
@@ -36,8 +36,8 @@ class GeminiOutfitRecommender:
             logger.error("GEMINI_API_KEY not found in environment variables!")
             self.client = None
             
-        # 3.0 Flash 최신 모델 ID
-        self.model_id = 'gemini-3-flash-preview'
+        # 2.5 Pro 모델 ID
+        self.model_id = 'gemini-2.5-pro'
     
     def recommend_outfit(
         self,
@@ -76,8 +76,8 @@ class GeminiOutfitRecommender:
                 style_preference
             )
             
-            # Gemini 3.0 전용 구조화된 Config 설정 적용
-            # temperature는 3.0 권장값인 1.0으로 설정하여 지능을 극대화합니다.
+            # Gemini 2.5 전용 구조화된 Config 설정 적용
+            # temperature는 권장값인 1.0으로 설정하여 지능을 극대화합니다.
             generate_config = types.GenerateContentConfig(
                 temperature=1.0, 
                 response_mime_type="application/json",
@@ -87,7 +87,7 @@ class GeminiOutfitRecommender:
                 )
             )
             
-            logger.info("Calling Gemini 3.0 Flash API (Thinking: HIGH)...")
+            logger.info("Calling Gemini 2.5 Pro API (Thinking: HIGH)...")
             response = self.client.models.generate_content(
                 model=self.model_id,
                 contents=prompt,

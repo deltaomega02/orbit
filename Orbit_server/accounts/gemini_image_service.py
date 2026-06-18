@@ -37,7 +37,7 @@ class GeminiImageGenerator:
         if not GEMINI_IMAGE_AVAILABLE:
             raise ValueError("Gemini API key not configured")
         # 모델명 유지
-        self.model_id = 'gemini-3-pro-image-preview'
+        self.model_id = 'gemini-2.5-flash-image-preview'
 
     def generate_virtual_tryon_image(
         self,

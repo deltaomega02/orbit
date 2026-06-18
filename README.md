@@ -74,8 +74,8 @@ AI 기반 패션 코디네이션 및 가상 착용 시뮬레이터를 제공하�
 - MySQL 8.0
 
 **AI Services**
-- Google Gemini 3 Flash (`gemini-3-flash-preview`) — 의류 상세 분석 및 코디 추천
-- Google Gemini 3 Pro Image (`gemini-3-pro-image-preview`) — 가상 착용 이미지 생성
+- Google Gemini 2.5 Pro (`gemini-2.5-pro`) — 의류 상세 분석 및 코디 추천
+- Google Gemini 2.5 Flash Image (`gemini-2.5-flash-image-preview`, 나노바나나) — 가상 착용 이미지 생성 (빠른 생성 속도 위해 Flash 이미지 모델 채택)
 
 **Image Processing**
 - Pillow (Python Imaging Library)
@@ -101,10 +101,10 @@ AI 기반 패션 코디네이션 및 가상 착용 시뮬레이터를 제공하�
 - **날씨 기반 추천**: 실시간 날씨 데이터(온도, 체감온도, 습도, 날씨 상태)를 분석하여 기후에 적합한 옷차림 제안
 - **일정 기반 추천**: 캘린더 이벤트를 분석하여 TPO(Time, Place, Occasion)에 맞는 코디 추천
 - **스타일 선호도 반영**: 사용자가 입력한 스타일 선호도를 AsyncStorage에 캐싱하고 추천 알고리즘에 적용
-- **AI 통합 추천**: Gemini 3 Flash를 활용하여 날씨, 일정, 스타일 선호도를 종합적으로 고려한 최적의 코디 제안
+- **AI 통합 추천**: Gemini 2.5 Pro를 활용하여 날씨, 일정, 스타일 선호도를 종합적으로 고려한 최적의 코디 제안
 
 ### 가상 착용 시뮬레이션
-- Gemini 3 Pro Image를 활용한 가상 착용 이미지 생성
+- Gemini 2.5 Flash Image를 활용한 가상 착용 이미지 생성
 - 사용자의 전신 사진과 선택한 의류를 AI 기반으로 합성
 - 생성은 서버에서 동기 처리되며, 클라이언트가 추천/생성 요청을 분리하고 폴링으로 갱신하는 **클라이언트 주도 비동기**로 대기 경험 최적화 (추천 결과 즉시 표시)
 - 9:16 세로 비율 최적화로 모바일 화면에 적합한 결과물 제공
@@ -112,7 +112,7 @@ AI 기반 패션 코디네이션 및 가상 착용 시뮬레이터를 제공하�
 ### 디지털 옷장 관리
 - 카메라 촬영 또는 갤러리에서 의류 이미지 업로드
 - 3단계 카테고리 시스템: TOP, BOTTOM, OUTER + 세부 서브 카테고리
-- Gemini 3 Flash AI 자동 분석을 통한 의류 상세 정보 생성
+- Gemini 2.5 Pro AI 자동 분석을 통한 의류 상세 정보 생성
   - 소재, 핏, 길이, 패턴, 스타일, 계절성 등 카테고리별 맞춤 분석
   - 코디 추천을 위한 구체적이고 실용적인 정보 제공
 - 그리드/리스트 뷰 전환 가능한 직관적인 UI
@@ -149,8 +149,8 @@ flowchart LR
     subgraph Server["Backend - Django REST Framework"]
         direction TB
         B1[Auth Service<br/>Email Token & OAuth 2.0]
-        B2[Gemini 3 Flash<br/>의류 분석 & 코디 추천]
-        B3[Gemini 3 Pro Image<br/>가상 착용 생성]
+        B2[Gemini 2.5 Pro<br/>의류 분석 & 코디 추천]
+        B3[Gemini 2.5 Flash Image<br/>가상 착용 생성]
         B4[Clothes & Outfit CRUD]
     end
 
@@ -182,7 +182,7 @@ flowchart LR
 2. Async Thunk → API Call to Django Backend
 3. Backend Processing:
    - 이미지 저장 (Django Media Storage)
-   - Gemini 3 Flash AI 분석 (의류 상세 정보 추출)
+   - Gemini 2.5 Pro AI 분석 (의류 상세 정보 추출)
    - MySQL Database 저장
 4. Response → Redux Reducer → Update State
 5. React Component Re-render → UI Update
@@ -190,14 +190,14 @@ flowchart LR
 **코디 추천 Flow**
 1. 사용자가 추천 요청 (날씨/일정/AI 기반)
 2. Frontend → 날씨 데이터, 일정 데이터, 스타일 선호도 수집
-3. Backend → Gemini 3 Flash에 의류 목록 + 컨텍스트 전달
+3. Backend → Gemini 2.5 Pro에 의류 목록 + 컨텍스트 전달
 4. Gemini AI → 최적의 코디 조합 및 스타일 팁 생성
 5. Backend → Coordination 저장 (MySQL) → 추천 결과 즉시 응답
 6. Frontend → 추천 결과 즉시 표시 (여기까지가 코디 추천 Flow)
 
 **가상 착용 Flow (별도 — 사용자가 '입어보기' 선택 시)**
 1. Frontend → 가상 착용 생성 엔드포인트(`coordinations/{id}/generate-tryon/`)로 별도 요청
-2. Backend → Gemini 3 Pro Image 호출로 이미지 생성 후 저장 (**요청 내 동기 처리**)
+2. Backend → Gemini 2.5 Flash Image 호출로 이미지 생성 후 저장 (**요청 내 동기 처리**)
 3. Frontend → 비동기는 클라이언트 주도: 추천 화면을 막지 않고, 생성 완료를 coordination 상세 polling으로 확인해 이미지 갱신
 
 ## Database Schema
@@ -539,9 +539,9 @@ orbit_backend/
 │   ├── serializers.py         # DRF serializers
 │   ├── urls.py                # URL routing
 │   ├── admin.py               # Django admin config
-│   ├── gemini_service.py         # Gemini 3 Flash - 의류 상세 분석
-│   ├── gemini_outfit_service.py  # Gemini 3 Flash - 코디 추천
-│   └── gemini_image_service.py   # Gemini 3 Pro Image - 가상 착용
+│   ├── gemini_service.py         # Gemini 2.5 Pro - 의류 상세 분석
+│   ├── gemini_outfit_service.py  # Gemini 2.5 Pro - 코디 추천
+│   └── gemini_image_service.py   # Gemini 2.5 Flash Image - 가상 착용
 │
 ├── orbit_backend/             # Project settings
 │   ├── settings.py

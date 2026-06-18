@@ -27,9 +27,9 @@
 
 ## AI 서비스 (`accounts/gemini_*.py`)
 
-- `gemini_service.py`: **Gemini 3 Flash**(`gemini-3-flash-preview`) — 의류 상세 분석.
-- `gemini_outfit_service.py`: **Gemini 3 Flash**(`gemini-3-flash-preview`) — 코디 추천.
-- `gemini_image_service.py`: **Gemini 3 Pro Image**(`gemini-3-pro-image-preview`) — 가상 착용 이미지 생성.
+- `gemini_service.py`: **Gemini 2.5 Pro**(`gemini-2.5-pro`) — 의류 상세 분석.
+- `gemini_outfit_service.py`: **Gemini 2.5 Pro**(`gemini-2.5-pro`) — 코디 추천.
+- `gemini_image_service.py`: **Gemini 2.5 Flash Image**(`gemini-2.5-flash-image-preview`, 나노바나나) — 가상 착용 이미지 생성 (빠른 속도 위해 Flash 이미지 모델 선택).
 
 가상 착용은 `generate_virtual_tryon` 뷰에서 **요청 내 동기 처리**된다(별도 작업 큐/스레드 없음). 비동기 사용자 경험은 클라이언트가 추천/생성 요청을 분리하고 폴링으로 갱신하는 방식으로 구현되어 있다.
 
