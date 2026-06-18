@@ -93,6 +93,7 @@ Orbit 앱의 데이터베이스는 **4개의 핵심 테이블**로 구성되어 
 │     profile_picture                 │
 │     sex (M/F)          ⭐ 변경      │
 │     height, weight                  │
+│     body_photo (전신사진)           │
 │     created_at, updated_at          │
 └─────────────────────────────────────┘
          │                      │
@@ -147,6 +148,7 @@ class User(AbstractUser):
     sex = models.CharField(max_length=10, choices=SEX_CHOICES)
     height = models.FloatField(null=True)
     weight = models.FloatField(null=True)
+    body_photo = models.ImageField(upload_to='body_photos/%Y/%m/%d/', null=True, blank=True)
     
     # 타임스탬프
     created_at = models.DateTimeField(auto_now_add=True)
@@ -166,6 +168,7 @@ class User(AbstractUser):
 | **sex** | CharField(10) | NULL | 성별 (M/F) ⭐ v2.1: 단순화 |
 | **height** | Float | NULL | 신장 (cm 단위) |
 | **weight** | Float | NULL | 체중 (kg 단위) |
+| **body_photo** | ImageField | NULL | 전신 사진 (가상 피팅용, 서버 저장) |
 | **created_at** | DateTime | NOT NULL | 계정 생성일 |
 | **updated_at** | DateTime | NOT NULL | 마지막 수정일 |
 

@@ -343,7 +343,12 @@ def analyze_clothing_image(request):
             'status': 'error',
             'message': 'Gemini AI 서비스를 사용할 수 없습니다'
         }, status=status.HTTP_503_SERVICE_UNAVAILABLE)
-    
+
+    # 인증 확인 (Gemini 호출 비용 보호 — 다른 엔드포인트와 동일하게 토큰 검증)
+    user = get_user_from_email_token(request)
+    if not user:
+        return Response({'error': '인증 실패'}, status=status.HTTP_401_UNAUTHORIZED)
+
     try:
         # 파라미터 추출
         image_file = request.FILES.get('image')
@@ -396,55 +401,7 @@ def clothes_detail(request, pk):
     """
     의류 상세 조회, 수정, 삭제
     이메일 토큰으로 사용자 인증
-    """
-    user = get_user_from_email_token(request)
-    if not user:
-        return Response({'error': '인증 실패'}, status=status.HTTP_401_UNAUTHORIZED)
-    
-    try:
-        clothes = Clothes.objects.get(pk=pk, user=user)
-    except Clothes.DoesNotExist:
-        return Response(
-            {'error': '의류를 찾을 수 없습니다'},
-            status=status.HTTP_404_NOT_FOUND
-        )
-    
-    if request.method == 'GET':
-        serializer = ClothesSerializer(clothes, context={'request': request})
-        return Response(serializer.data)
-    
-    elif request.method in ['PUT', 'PATCH']:
-        partial = request.method == 'PATCH'
-        serializer = ClothesCreateSerializer(
-            clothes, 
-            data=request.data, 
-            partial=partial,
-            context={'request': request}
-        )
-        
-        if serializer.is_valid():
-            serializer.save()
-            response_serializer = ClothesSerializer(clothes, context={'request': request})
-            return Response(response_serializer.data)
-        
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    elif request.method == 'DELETE':
-        # 이미지 파일도 함께 삭제
-        if clothes.image:
-            clothes.image.delete(save=False)
-        
-        clothes.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
 
-
-@api_view(['GET', 'PUT', 'PATCH', 'DELETE'])
-@parser_classes([MultiPartParser, FormParser, JSONParser])
-def clothes_detail(request, pk):
-    """
-    의류 상세 조회, 수정, 삭제
-    이메일 토큰으로 사용자 인증
-    
     PUT/PATCH: 옷 이름, 서브카테고리 등 수정 가능
     """
     user = get_user_from_email_token(request)

@@ -12,9 +12,6 @@ from accounts.views import serve_media
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/accounts/', include('accounts.urls')),
-    
-    path('dashboard/', include('accounts.dashboard_urls')),
-    path('api/dashboard/', include('accounts.dashboard_urls')),
 
     # ============================================
     # 미디어 파일 서빙 (동적 리사이징 지원)

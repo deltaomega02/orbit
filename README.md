@@ -67,22 +67,22 @@ AI 기반 패션 코디네이션 및 가상 착용 시뮬레이터를 제공하�
 
 **Language & Framework**
 - Python 3.9+
-- Django 4.x
+- Django 5.2
 - Django REST Framework
 
 **Database**
 - MySQL 8.0
 
 **AI Services**
-- Google Gemini 2.5 Pro (의류 상세 분석 및 코디 추천)
-- Google Gemini 3.0 Pro Image Preview (가상 착용 이미지 생성)
+- Google Gemini 3 Flash (`gemini-3-flash-preview`) — 의류 상세 분석 및 코디 추천
+- Google Gemini 3 Pro Image (`gemini-3-pro-image-preview`) — 가상 착용 이미지 생성
 
 **Image Processing**
 - Pillow (Python Imaging Library)
 
 **Authentication**
-- Google OAuth 2.0
-- Email-based Token Authentication
+- 클라이언트: Google Sign-In (Google OAuth 2.0) 로 로그인
+- 서버: 이메일 기반 간이 토큰(`Authorization: Token <email>`)으로 사용자 식별 — **졸업작품용 단순 인증**(서명·만료 없음). 실서비스화 시 서명·만료가 있는 JWT 또는 DRF TokenAuth 로 교체 대상. (현재 simplejwt는 설정만 되어 있고 실사용되지 않음)
 
 ### Infrastructure
 
@@ -101,18 +101,18 @@ AI 기반 패션 코디네이션 및 가상 착용 시뮬레이터를 제공하�
 - **날씨 기반 추천**: 실시간 날씨 데이터(온도, 체감온도, 습도, 날씨 상태)를 분석하여 기후에 적합한 옷차림 제안
 - **일정 기반 추천**: 캘린더 이벤트를 분석하여 TPO(Time, Place, Occasion)에 맞는 코디 추천
 - **스타일 선호도 반영**: 사용자가 입력한 스타일 선호도를 AsyncStorage에 캐싱하고 추천 알고리즘에 적용
-- **AI 통합 추천**: Gemini 2.5 Pro를 활용하여 날씨, 일정, 스타일 선호도를 종합적으로 고려한 최적의 코디 제안
+- **AI 통합 추천**: Gemini 3 Flash를 활용하여 날씨, 일정, 스타일 선호도를 종합적으로 고려한 최적의 코디 제안
 
 ### 가상 착용 시뮬레이션
-- Gemini 3.0 Pro Image Preview를 활용한 가상 착용 이미지 생성
+- Gemini 3 Pro Image를 활용한 가상 착용 이미지 생성
 - 사용자의 전신 사진과 선택한 의류를 AI 기반으로 합성
-- 백그라운드 프로세싱을 통한 비동기 이미지 생성으로 사용자 경험 최적화
+- 생성은 서버에서 동기 처리되며, 클라이언트가 추천/생성 요청을 분리하고 폴링으로 갱신하는 **클라이언트 주도 비동기**로 대기 경험 최적화 (추천 결과 즉시 표시)
 - 9:16 세로 비율 최적화로 모바일 화면에 적합한 결과물 제공
 
 ### 디지털 옷장 관리
 - 카메라 촬영 또는 갤러리에서 의류 이미지 업로드
 - 3단계 카테고리 시스템: TOP, BOTTOM, OUTER + 세부 서브 카테고리
-- Gemini 2.5 Pro AI 자동 분석을 통한 의류 상세 정보 생성
+- Gemini 3 Flash AI 자동 분석을 통한 의류 상세 정보 생성
   - 소재, 핏, 길이, 패턴, 스타일, 계절성 등 카테고리별 맞춤 분석
   - 코디 추천을 위한 구체적이고 실용적인 정보 제공
 - 그리드/리스트 뷰 전환 가능한 직관적인 UI
@@ -125,7 +125,7 @@ AI 기반 패션 코디네이션 및 가상 착용 시뮬레이터를 제공하�
 
 ### 데이터 캐싱 시스템
 - AsyncStorage 기반의 로컬 캐싱으로 API 호출 최소화
-- 날씨 데이터, 일정 데이터, 스타일 선호도를 자정 기준 일별 캐시 관리
+- 캘린더 일정 데이터·스타일 선호도를 자정 기준 일별 캐시 관리 (날씨는 항상 실시간 조회)
 - 네트워크 의존성 감소 및 응답 속도 향상
 
 ## Architecture
@@ -149,8 +149,8 @@ flowchart LR
     subgraph Server["Backend - Django REST Framework"]
         direction TB
         B1[Auth Service<br/>Email Token & OAuth 2.0]
-        B2[Gemini 2.5 Pro<br/>의류 분석 & 코디 추천]
-        B3[Gemini 3.0 Pro Image<br/>가상 착용 생성]
+        B2[Gemini 3 Flash<br/>의류 분석 & 코디 추천]
+        B3[Gemini 3 Pro Image<br/>가상 착용 생성]
         B4[Clothes & Outfit CRUD]
     end
 
@@ -182,7 +182,7 @@ flowchart LR
 2. Async Thunk → API Call to Django Backend
 3. Backend Processing:
    - 이미지 저장 (Django Media Storage)
-   - Gemini 2.5 Pro AI 분석 (의류 상세 정보 추출)
+   - Gemini 3 Flash AI 분석 (의류 상세 정보 추출)
    - MySQL Database 저장
 4. Response → Redux Reducer → Update State
 5. React Component Re-render → UI Update
@@ -190,11 +190,15 @@ flowchart LR
 **코디 추천 Flow**
 1. 사용자가 추천 요청 (날씨/일정/AI 기반)
 2. Frontend → 날씨 데이터, 일정 데이터, 스타일 선호도 수집
-3. Backend → Gemini 2.5 Pro에 의류 목록 + 컨텍스트 전달
+3. Backend → Gemini 3 Flash에 의류 목록 + 컨텍스트 전달
 4. Gemini AI → 최적의 코디 조합 및 스타일 팁 생성
-5. Backend → Coordination 저장 (MySQL)
-6. Backend → Gemini 3.0 Pro Image에 가상 착용 이미지 생성 요청 (백그라운드)
-7. Frontend → 추천 결과 즉시 표시, 이미지는 생성 완료 시 polling으로 업데이트
+5. Backend → Coordination 저장 (MySQL) → 추천 결과 즉시 응답
+6. Frontend → 추천 결과 즉시 표시 (여기까지가 코디 추천 Flow)
+
+**가상 착용 Flow (별도 — 사용자가 '입어보기' 선택 시)**
+1. Frontend → 가상 착용 생성 엔드포인트(`coordinations/{id}/generate-tryon/`)로 별도 요청
+2. Backend → Gemini 3 Pro Image 호출로 이미지 생성 후 저장 (**요청 내 동기 처리**)
+3. Frontend → 비동기는 클라이언트 주도: 추천 화면을 막지 않고, 생성 완료를 coordination 상세 polling으로 확인해 이미지 갱신
 
 ## Database Schema
 
@@ -212,6 +216,7 @@ erDiagram
         string email UK
         string username UK
         string google_id UK
+        string profile_picture
         string sex
         int height
         int weight
@@ -237,8 +242,9 @@ erDiagram
         int id PK
         int user_id FK
         string name
-        string occasion
-        string vto_image
+        text detail
+        string image
+        boolean is_favorite
         datetime created_at
         datetime updated_at
     }
@@ -319,7 +325,7 @@ npx expo run:android
 
 ```bash
 # Navigate to backend directory
-cd orbit_backend
+cd Orbit_server
 
 # Create virtual environment
 python -m venv orbitserver
@@ -374,7 +380,7 @@ EXIT;
 npm start
 
 # Backend (Django)
-cd orbit_backend
+cd Orbit_server
 source orbitserver/bin/activate
 python manage.py runserver 0.0.0.0:8000
 
@@ -386,35 +392,38 @@ python manage.py runserver 0.0.0.0:8000
 
 ```
 # Authentication
-POST   /api/accounts/google-login/          # Google OAuth login (email-based token)
+POST   /api/accounts/auth/google/           # Google 로그인 (이메일 기반 간이 토큰 발급)
+DELETE /api/accounts/auth/guest/            # 게스트 계정 삭제 (로그아웃 시)
 
 # User Profile
-GET    /api/accounts/user/profile/          # Get user profile
-PUT    /api/accounts/user/profile/          # Update user profile (full update)
-PATCH  /api/accounts/user/profile/          # Partial update (supports body_photo upload)
+GET    /api/accounts/user/profile/          # 프로필 조회
+PUT    /api/accounts/user/profile/          # 프로필 전체 수정
+PATCH  /api/accounts/user/profile/          # 부분 수정 (body_photo 업로드 지원)
 
 # Clothes Management
-GET    /api/accounts/clothes/               # List all user's clothes
-POST   /api/accounts/clothes/               # Add new clothing item (with Gemini AI analysis)
-GET    /api/accounts/clothes/{id}/          # Get clothing detail
-PUT    /api/accounts/clothes/{id}/          # Update clothing
-DELETE /api/accounts/clothes/{id}/          # Delete clothing
+GET    /api/accounts/clothes/               # 의류 목록
+POST   /api/accounts/clothes/               # 의류 등록
+GET    /api/accounts/clothes/{id}/          # 의류 상세
+PUT    /api/accounts/clothes/{id}/          # 의류 수정
+DELETE /api/accounts/clothes/{id}/          # 의류 삭제
+GET    /api/accounts/clothes/stats/         # 옷장 통계 (카테고리별 개수)
+POST   /api/accounts/clothes/analyze/       # Gemini 의류 이미지 분석 (인증 필요)
 
 # Outfit Recommendations
-POST   /api/accounts/recommend-outfit/      # Get AI outfit recommendation
-                                            # (supports weather, schedule, style preference)
+POST   /api/accounts/outfit/recommend/      # AI 코디 추천 (날씨/일정/스타일 선호 반영)
 
 # Coordinations
-POST   /api/accounts/coordinations/         # Create/save coordination
-GET    /api/accounts/coordinations/         # List user's coordinations
-GET    /api/accounts/coordinations/{id}/    # Get coordination detail
-DELETE /api/accounts/coordinations/{id}/    # Delete coordination
+POST   /api/accounts/coordinations/         # 코디 생성/저장
+GET    /api/accounts/coordinations/         # 코디 목록
+GET    /api/accounts/coordinations/{id}/    # 코디 상세
+DELETE /api/accounts/coordinations/{id}/    # 코디 삭제
+POST   /api/accounts/coordinations/{id}/favorite/        # 즐겨찾기 토글
 
 # Virtual Try-On
-POST   /api/accounts/coordinations/{id}/generate-tryon/  # Generate virtual try-on image
+POST   /api/accounts/coordinations/{id}/generate-tryon/  # 가상 착용 이미지 생성
 
 # Utility
-GET    /api/accounts/test/                  # Server health check
+GET    /api/accounts/test/                  # 서버 헬스 체크
 ```
 
 ## Project Structure
@@ -530,10 +539,9 @@ orbit_backend/
 │   ├── serializers.py         # DRF serializers
 │   ├── urls.py                # URL routing
 │   ├── admin.py               # Django admin config
-│   └── services/
-│       ├── gemini_service.py         # Gemini 2.5 Pro - 의류 상세 분석
-│       ├── gemini_outfit_service.py  # Gemini 2.5 Pro - 코디 추천
-│       └── gemini_image_service.py   # Gemini 3.0 Pro Image - 가상 착용
+│   ├── gemini_service.py         # Gemini 3 Flash - 의류 상세 분석
+│   ├── gemini_outfit_service.py  # Gemini 3 Flash - 코디 추천
+│   └── gemini_image_service.py   # Gemini 3 Pro Image - 가상 착용
 │
 ├── orbit_backend/             # Project settings
 │   ├── settings.py

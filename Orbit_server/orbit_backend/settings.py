@@ -24,9 +24,11 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# 기본값 False — 로컬 개발 시 .env 에 DEBUG=True 설정
+DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
-ALLOWED_HOSTS = ['*']
+# 기본값은 로컬만 허용 — 배포 시 .env 의 ALLOWED_HOSTS(콤마 구분)로 주입
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
 # Application definition
 INSTALLED_APPS = [
@@ -82,7 +84,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': os.getenv('DB_NAME', 'orbit_db'),
         'USER': os.getenv('DB_USER', 'orbit_admin'),
-        'PASSWORD': os.getenv('DB_PASSWORD', 'YOUR_DB_PASSWORD'),
+        'PASSWORD': os.getenv('DB_PASSWORD', ''),
         'HOST': os.getenv('DB_HOST', '127.0.0.1'),
         'PORT': os.getenv('DB_PORT', '3306'),
         'OPTIONS': {
@@ -136,11 +138,18 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # ============================================================================
 # CORS 설정 (React Native 앱과 통신)
+# 네이티브 앱은 브라우저 Origin이 없어 CORS 영향이 적지만,
+# 전체 허용은 DEBUG(로컬)에서만. 배포 시 CORS_ALLOWED_ORIGINS(콤마 구분)로 화이트리스트.
 # ============================================================================
-CORS_ALLOW_ALL_ORIGINS = True  # 개발용
+CORS_ALLOW_ALL_ORIGINS = DEBUG
+CORS_ALLOWED_ORIGINS = [o for o in os.getenv('CORS_ALLOWED_ORIGINS', '').split(',') if o]
 
 # ============================================================================
 # REST Framework 설정
+# NOTE: 실제 사용자 인증은 각 뷰의 get_user_from_email_token() 으로 수행한다
+# (Authorization: Token <email> 기반의 졸업작품용 간이 인증). 아래 JWT 기본
+# 인증 클래스는 현재 실사용되지 않으며, 실서비스화 시 서명·만료가 있는 JWT
+# 액세스/리프레시 토큰 또는 DRF TokenAuth 로 교체 대상.
 # ============================================================================
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
