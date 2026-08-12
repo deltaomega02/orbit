@@ -1,7 +1,7 @@
 # accounts/gemini_service.py
-# Gemini 2.5 Pro API를 사용하여 옷 이미지 분석
+# Gemini 3.0 Flash API (High Thinking Mode)를 사용하여 옷 이미지 분석
 # 상세한 옷 정보 추출 서비스
-# v5.4: v4.0의 모든 기능 유지 + Gemini 2.5 Pro 엔진 (안정화 버전)
+# v5.4: v4.0의 모든 기능 유지 + Gemini 3.0 Flash 엔진 교체 (안정화 버전)
 
 import os
 # [중요] 최신 google-genai SDK 사용 (pip install -U google-genai)
@@ -20,7 +20,7 @@ GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
 
 class GeminiClothingAnalyzer:
     """
-    Gemini 2.5 Pro를 사용하여 옷 이미지를 분석하고 상세 정보를 추출하는 서비스.
+    Gemini 3.0 Flash를 사용하여 옷 이미지를 분석하고 상세 정보를 추출하는 서비스.
     동작이 확인된 v4.0의 프롬프트와 파싱 로직을 100% 보존하며 엔진만 교체함.
     """
     
@@ -29,7 +29,7 @@ class GeminiClothingAnalyzer:
         if GEMINI_API_KEY:
             try:
                 self.client = genai.Client(api_key=GEMINI_API_KEY)
-                logger.info("Gemini 2.5 Pro Client initialized")
+                logger.info("Gemini 3.0 Flash Client initialized")
             except Exception as e:
                 logger.error(f"Failed to initialize Gemini Client: {str(e)}")
                 self.client = None
@@ -37,8 +37,8 @@ class GeminiClothingAnalyzer:
             logger.error("GEMINI_API_KEY not found in environment variables!")
             self.client = None
             
-        # 2.5 Pro 모델 ID
-        self.model_id = 'gemini-2.5-pro'
+        # 3.0 Flash 최신 모델 ID
+        self.model_id = 'gemini-3-flash-preview'
     
     def analyze_clothing_image(self, image_file, main_category: str, sub_category: str, 
                                name: str, color: str) -> dict:
@@ -46,7 +46,7 @@ class GeminiClothingAnalyzer:
             return self._get_fallback_result(main_category, sub_category, name, color)
 
         try:
-            logger.info(f"Starting Gemini 2.5 Pro analysis for {name}")
+            logger.info(f"Starting Gemini 3.0 Flash analysis for {name}")
             
             # 이미지 로드
             image = Image.open(image_file)
@@ -54,12 +54,12 @@ class GeminiClothingAnalyzer:
             # 프롬프트 생성 (기존 v4.0 로직)
             prompt = self._create_analysis_prompt(main_category, sub_category, name, color)
             
-            # [핵심 수정] Gemini 2.5 Thinking 설정 적용
+            # [핵심 수정] Gemini 3.0 Thinking 설정 적용
             response = self.client.models.generate_content(
                 model=self.model_id,
                 contents=[prompt, image],
                 config=types.GenerateContentConfig(
-                    temperature=1.0, # 권장값
+                    temperature=1.0, # 3.0 Flash 권장값
                     # Thinking 모드 활성화 설정
                     thinking_config=types.ThinkingConfig(
                         include_thoughts=False, # True로 하면 사고 과정 텍스트도 반환됨 (디버깅용)
@@ -74,7 +74,7 @@ class GeminiClothingAnalyzer:
             return result
             
         except Exception as e:
-            logger.error(f"Error in Gemini 2.5 analysis: {str(e)}")
+            logger.error(f"Error in Gemini 3.0 analysis: {str(e)}")
             return self._get_fallback_result(main_category, sub_category, name, color)
 
     def _create_analysis_prompt(self, main_category: str, sub_category: str, 
