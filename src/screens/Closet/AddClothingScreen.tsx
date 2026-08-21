@@ -213,7 +213,6 @@ const AddClothingScreen: React.FC<AddClothingScreenProps> = ({ navigation }) => 
       });
 
       if (!result.canceled && result.assets[0]) {
-        console.log('📷 앨범에서 선택:', result.assets[0].uri);
         setPhotoUri(result.assets[0].uri);
       }
     } catch (error) {
@@ -226,10 +225,8 @@ const AddClothingScreen: React.FC<AddClothingScreenProps> = ({ navigation }) => 
   const handleTakePhoto = () => {
     setPhotoSelectModalVisible(false);
     
-    console.log('📷 사진 촬영 화면으로 이동');
     navigation.navigate('ClothingPhoto', {
       onPhotoTaken: (photoPath: string) => {
-        console.log('✅ 사진 경로 받음:', photoPath);
         setPhotoUri(photoPath);
       }
     });
@@ -238,7 +235,6 @@ const AddClothingScreen: React.FC<AddClothingScreenProps> = ({ navigation }) => 
   // ⭐ AI 분석 함수
   const analyzeWithAI = async (imageUri: string): Promise<string> => {
     try {
-      console.log('[AI] 분석 시작:', name);
       setAiStatus('analyzing');
       setAiProgress(0);
       setAiMessage('AI가 옷의 디테일을 분석하고 있습니다...');
@@ -276,7 +272,6 @@ const AddClothingScreen: React.FC<AddClothingScreenProps> = ({ navigation }) => 
         setAiProgress(100);
         setAiStatus('completed');
         setAiMessage('분석이 완료되었습니다!');
-        console.log('[AI] 분석 완료:', response.data.detail);
         return response.data.detail || '';
       } else {
         throw new Error(response.data.message || 'AI 분석 실패');
@@ -364,7 +359,6 @@ const AddClothingScreen: React.FC<AddClothingScreenProps> = ({ navigation }) => 
       } 
       // 2. 사진이 없는 경우 → 수동 입력 사용
       else {
-        console.log('📝 텍스트 기반 등록 시작...');
         setIsAnalyzing(true);
         setAiStatus('analyzing');
         setAiProgress(30);
@@ -377,11 +371,9 @@ const AddClothingScreen: React.FC<AddClothingScreenProps> = ({ navigation }) => 
             return `${field?.label}: ${value}`;
           });
         finalDetail = detailLines.join('\n');
-        console.log('📝 생성된 detail:', finalDetail);
       }
 
       // 3. 서버에 저장
-      console.log('💾 서버에 저장 시작...');
       setAiMessage('서버에 저장 중...');
       setAiProgress(70);
 
@@ -405,7 +397,6 @@ const AddClothingScreen: React.FC<AddClothingScreenProps> = ({ navigation }) => 
 
       setAiProgress(100);
       setAiMessage('저장 완료!');
-      console.log('✅ 저장 완료!');
 
       // 4. 옷장 데이터 새로고침
       await dispatch(fetchClothes() as any);

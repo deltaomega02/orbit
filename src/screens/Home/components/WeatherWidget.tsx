@@ -23,9 +23,6 @@ export const WeatherWidget: React.FC = () => {
   const [isGuest, setIsGuest] = useState(false);
 
   useEffect(() => {
-    console.log('==========================================');
-    console.log('🚀 WeatherWidget 마운트됨 - 데이터 로드 시작');
-    console.log('==========================================');
     checkLoginType();
     loadData();
   }, []);
@@ -37,33 +34,27 @@ export const WeatherWidget: React.FC = () => {
     const loginType = await AuthService.getLoginType();
     const guestMode = loginType === 'guest';
     setIsGuest(guestMode);
-    console.log('🔍 [WeatherWidget] 로그인 타입:', loginType, '(게스트:', guestMode, ')');
   };
 
   /**
    * 날씨 및 일정 데이터 로드
    */
   const loadData = async () => {
-    console.log('🔍 [WeatherWidget] loadData 시작');
     setLoading(true);
     setLocationError(false);
     setCalendarError(false);
 
     // 1. 위치 권한 요청 및 날씨 정보 가져오기
-    console.log('🌤️ [WeatherWidget] 날씨 정보 로드 시작...');
     await loadWeather();
 
     // 2. 게스트가 아닐 때만 Google Calendar 일정 가져오기
     const loginType = await AuthService.getLoginType();
     if (loginType !== 'guest') {
-      console.log('📅 [WeatherWidget] 캘린더 일정 로드 시작...');
       await loadCalendar();
     } else {
-      console.log('⚠️ [WeatherWidget] 게스트 모드 - 캘린더 로드 건너뜀');
     }
 
     setLoading(false);
-    console.log('✅ [WeatherWidget] loadData 완료');
   };
 
   /**
@@ -71,11 +62,9 @@ export const WeatherWidget: React.FC = () => {
    */
   const loadWeather = async () => {
     try {
-      console.log('🌍 [Weather] 1단계: 위치 권한 요청 시작');
       
       // 위치 권한 요청
       const { status } = await Location.requestForegroundPermissionsAsync();
-      console.log(`🔐 [Weather] 위치 권한 상태: ${status}`);
 
       if (status !== 'granted') {
         console.warn('⚠️ [Weather] 위치 권한 거부됨');
@@ -83,18 +72,13 @@ export const WeatherWidget: React.FC = () => {
         return;
       }
 
-      console.log('📍 [Weather] 2단계: 현재 위치 가져오기 시작');
       
       // 현재 위치 가져오기
       const location = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.Balanced,
       });
 
-      console.log('✅ [Weather] 위치 가져오기 성공:');
-      console.log(`   - 위도: ${location.coords.latitude}`);
-      console.log(`   - 경도: ${location.coords.longitude}`);
 
-      console.log('🌤️ [Weather] 3단계: 날씨 API 호출 시작');
       
       // 날씨 정보 조회
       const weatherData = await weatherService.getWeatherByCoords(
@@ -106,12 +90,6 @@ export const WeatherWidget: React.FC = () => {
         console.error('❌ [Weather] 날씨 조회 실패:', weatherData.message);
         setLocationError(true);
       } else {
-        console.log('✅ [Weather] 날씨 정보 성공:');
-        console.log(`   - 온도: ${weatherData.temp}°C`);
-        console.log(`   - 날씨: ${weatherData.description}`);
-        console.log(`   - 습도: ${weatherData.humidity}%`);
-        console.log(`   - 풍속: ${weatherData.windSpeed}m/s`);
-        console.log(`   - 위치: ${weatherData.location}`);
         setWeather(weatherData);
       }
     } catch (error) {
@@ -130,7 +108,6 @@ export const WeatherWidget: React.FC = () => {
    */
   const loadCalendar = async () => {
     try {
-      console.log('📅 [Calendar] 일정 조회 시작 (강제 새로고침)');
       
       // ★ forceRefresh = true로 캐시 무시하고 항상 새로 가져옴
       const eventsData = await calendarService.getTodayEvents(true);
@@ -139,11 +116,8 @@ export const WeatherWidget: React.FC = () => {
         console.warn('⚠️ [Calendar] 일정 조회 실패:', eventsData.message);
         setCalendarError(true);
       } else {
-        console.log('✅ [Calendar] 일정 조회 성공:');
-        console.log(`   - 오늘의 일정: ${eventsData.length}개`);
         if (eventsData.length > 0) {
           eventsData.forEach((event, index) => {
-            console.log(`   ${index + 1}. ${event.summary} (${calendarService.formatTime(event.start)})`);
           });
         }
         setEvents(eventsData);

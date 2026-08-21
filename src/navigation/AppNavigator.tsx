@@ -35,25 +35,20 @@ const AppNavigator: React.FC = () => {
 
   const checkAppStatus = async () => {
     try {
-      console.log('[AppNavigator] Checking app status...');
 
       // 1. 로그인 상태 확인
       const loggedIn = await AuthService.isLoggedIn();
-      console.log('[AppNavigator] Is logged in:', loggedIn);
       setIsLoggedIn(loggedIn);
 
       if (loggedIn) {
         const userInfo = await AuthService.getUserInfo();
         const loginType = await AuthService.getLoginType();
-        console.log('[AppNavigator] User:', userInfo?.user.name);
-        console.log('[AppNavigator] Login type:', loginType);
       }
 
       // 2. 온보딩 상태 확인
       const onboardingComplete = await AsyncStorage.getItem(
         Config.STORAGE_KEYS.ONBOARDING
       );
-      console.log('[AppNavigator] Onboarding complete:', onboardingComplete);
       setIsOnboarded(onboardingComplete === 'true');
 
     } catch (error) {

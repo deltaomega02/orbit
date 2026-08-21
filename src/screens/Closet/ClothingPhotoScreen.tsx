@@ -89,7 +89,6 @@ const ClothingPhotoScreen: React.FC<ClothingPhotoScreenProps> = ({ navigation, r
         enableShutterSound: true,
       });
       
-      console.log('📸 Photo captured:', photo.path);
       
       if (route.params?.onPhotoTaken) {
         route.params.onPhotoTaken(`file://${photo.path}`);

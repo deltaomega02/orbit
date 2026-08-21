@@ -194,7 +194,6 @@ export const ClothingDetailModal: React.FC<ClothingDetailModalProps> = ({
                     cachePolicy="memory-disk"
                     priority="normal"
                     onLoad={() => {
-                      console.log('✅ [DetailModal] 고화질 이미지 로드 완료');
                       setIsHighResLoaded(true);
                     }}
                   />

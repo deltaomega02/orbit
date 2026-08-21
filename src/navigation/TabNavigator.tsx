@@ -100,7 +100,6 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
           const email = userInfo?.user?.email || '';
           const isGuest = email.endsWith('@orbit.guest');
           setIsGuestAccount(isGuest);
-          console.log('👤 [TabNavigator] 계정 타입:', isGuest ? '게스트' : '일반 사용자');
         }
       } catch (error) {
         console.error('❌ [TabNavigator] 계정 타입 확인 실패:', error);
@@ -122,7 +121,6 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
         windSpeed: weatherCache.windSpeed || 0,
         location: weatherCache.location || '현재 위치',
       });
-      console.log('✅ [TabNavigator] Redux 캐시 → 날씨 표시');
     }
   }, [weatherCache]);
 
@@ -137,7 +135,6 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
         description: e.description,
       }));
       setEvents(cachedEvents);
-      console.log('✅ [TabNavigator] Redux 캐시 → 일정 표시:' + cachedEvents.length + '개');
     }
   }, [calendarCache]);
   
@@ -169,11 +166,9 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
   // 날씨 & 일정 데이터 로드
   useEffect(() => {
     const loadData = async () => {
-      console.log('🔄 [TabNavigator] 날씨 & 일정 로드 시작');
       
       // ⭐️ 캘린더 캐시 완전 해제 (임시)
       await AsyncStorage.removeItem('calendarCache');
-      console.log('🗓️ [TabNavigator] 캘린더 캐시 삭제 완료');
 
       
       // 날씨 로드
@@ -202,7 +197,6 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
               windSpeed: weatherData.windSpeed,
               timestamp: Date.now(),
             }));
-            console.log('✅ [TabNavigator] 날씨 로드 성공');
           }
         }
       } catch (error) {
@@ -228,13 +222,11 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
               })),
               timestamp: Date.now(),
             }));
-            console.log('✅ [TabNavigator] 일정 로드 성공:', eventsData.length + '개');
           }
         } catch (error) {
           console.error('❌ [TabNavigator] 일정 로드 실패:', error);
         }
       } else {
-        console.log('🚪 [TabNavigator] 게스트 계정 - 일정 로드 스킵');
       }
       
       setDataLoading(false);

@@ -22,7 +22,6 @@ export const saveWeatherCache = async (
       timestamp: Date.now(),
     };
     await AsyncStorage.setItem(CACHE_KEYS.WEATHER, JSON.stringify(cacheData));
-    console.log('✅ 날씨 캐시 저장 완료:', new Date(cacheData.timestamp));
     return true;
   } catch (error) {
     console.error('❌ 날씨 캐시 저장 실패:', error);
@@ -37,7 +36,6 @@ export const loadWeatherCache = async (): Promise<WeatherCache | null> => {
   try {
     const cached = await AsyncStorage.getItem(CACHE_KEYS.WEATHER);
     if (!cached) {
-      console.log('ℹ️ 날씨 캐시 없음');
       return null;
     }
 
@@ -46,12 +44,10 @@ export const loadWeatherCache = async (): Promise<WeatherCache | null> => {
     if (isCacheExpired(data.timestamp)) {
       const cacheDate = new Date(data.timestamp);
       const cachedDay = `${cacheDate.getFullYear()}-${cacheDate.getMonth() + 1}-${cacheDate.getDate()}`;
-      console.log('⏰ 날씨 캐시 만료됨 (캐시 날짜:', cachedDay, ')');
       return null;
     }
 
     const age = Date.now() - data.timestamp;
-    console.log('✅ 날씨 캐시 로드 완료 (나이:', Math.floor(age / 1000 / 60), '분)');
     return data;
   } catch (error) {
     console.error('❌ 날씨 캐시 로드 실패:', error);
@@ -74,7 +70,6 @@ export const saveCalendarCache = async (
       CACHE_KEYS.CALENDAR,
       JSON.stringify(cacheData)
     );
-    console.log('✅ 일정 캐시 저장 완료:', new Date(cacheData.timestamp));
     return true;
   } catch (error) {
     console.error('❌ 일정 캐시 저장 실패:', error);
@@ -89,7 +84,6 @@ export const loadCalendarCache = async (): Promise<CalendarCache | null> => {
   try {
     const cached = await AsyncStorage.getItem(CACHE_KEYS.CALENDAR);
     if (!cached) {
-      console.log('ℹ️ 일정 캐시 없음');
       return null;
     }
 
@@ -98,12 +92,10 @@ export const loadCalendarCache = async (): Promise<CalendarCache | null> => {
     if (isCacheExpired(data.timestamp)) {
       const cacheDate = new Date(data.timestamp);
       const cachedDay = `${cacheDate.getFullYear()}-${cacheDate.getMonth() + 1}-${cacheDate.getDate()}`;
-      console.log('⏰ 일정 캐시 만료됨 (캐시 날짜:', cachedDay, ')');
       return null;
     }
 
     const age = Date.now() - data.timestamp;
-    console.log('✅ 일정 캐시 로드 완료 (나이:', Math.floor(age / 1000 / 60), '분)');
     return data;
   } catch (error) {
     console.error('❌ 일정 캐시 로드 실패:', error);
@@ -118,11 +110,9 @@ export const clearCache = async (type: 'weather' | 'calendar' | 'all') => {
   try {
     if (type === 'weather' || type === 'all') {
       await AsyncStorage.removeItem(CACHE_KEYS.WEATHER);
-      console.log('🗑️ 날씨 캐시 삭제 완료');
     }
     if (type === 'calendar' || type === 'all') {
       await AsyncStorage.removeItem(CACHE_KEYS.CALENDAR);
-      console.log('🗑️ 일정 캐시 삭제 완료');
     }
   } catch (error) {
     console.error('❌ 캐시 삭제 실패:', error);
@@ -160,9 +150,6 @@ export const logCacheStatus = async () => {
   const weather = await loadWeatherCache();
   const calendar = await loadCalendarCache();
   
-  console.log('📊 캐시 상태:');
-  console.log('  - 날씨:', weather ? `${Math.floor((Date.now() - weather.timestamp) / 1000 / 60)}분 전` : '없음');
-  console.log('  - 일정:', calendar ? `${Math.floor((Date.now() - calendar.timestamp) / 1000 / 60)}분 전` : '없음');
 };
 
 /**
@@ -180,7 +167,6 @@ export const saveStylePreference = async (
       CACHE_KEYS.STYLE_PREFERENCE,
       JSON.stringify(cacheData)
     );
-    console.log('✅ 스타일 프리퍼런스 저장 완료:', preference);
     return true;
   } catch (error) {
     console.error('❌ 스타일 프리퍼런스 저장 실패:', error);
@@ -196,12 +182,10 @@ export const loadStylePreference = async (): Promise<string | null> => {
   try {
     const cached = await AsyncStorage.getItem(CACHE_KEYS.STYLE_PREFERENCE);
     if (!cached) {
-      console.log('ℹ️ 스타일 프리퍼런스 없음');
       return null;
     }
 
     const data: StylePreferenceCache = JSON.parse(cached);
-    console.log('✅ 스타일 프리퍼런스 로드 완료:', data.preference);
     return data.preference;
   } catch (error) {
     console.error('❌ 스타일 프리퍼런스 로드 실패:', error);
@@ -215,7 +199,6 @@ export const loadStylePreference = async (): Promise<string | null> => {
 export const clearStylePreference = async (): Promise<boolean> => {
   try {
     await AsyncStorage.removeItem(CACHE_KEYS.STYLE_PREFERENCE);
-    console.log('🗑️ 스타일 프리퍼런스 삭제 완료');
     return true;
   } catch (error) {
     console.error('❌ 스타일 프리퍼런스 삭제 실패:', error);

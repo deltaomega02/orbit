@@ -38,7 +38,6 @@ class AuthServiceClass {
           ],
         });
         this.isGoogleConfigured = true;
-        console.log('[Auth] ✅ Google Sign-In configured');
       }
     } catch (error) {
       console.error('[Auth] ❌ Google Sign-In configuration error:', error);
@@ -95,7 +94,6 @@ class AuthServiceClass {
       await AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
       await AsyncStorage.setItem('isLoggedIn', 'true');
       await AsyncStorage.setItem('loginType', loginType);
-      console.log('[Auth] ✅ User info saved');
     } catch (error) {
       console.error('[Auth] ❌ Save user info error:', error);
       throw error;
@@ -125,7 +123,6 @@ class AuthServiceClass {
       await this.saveUserInfo(guestUserInfo, 'guest');
       await AsyncStorage.setItem('guestSessionId', guestId);
       
-      console.log('[Auth] ✅ Guest account created:', guestId);
       return guestUserInfo;
       
     } catch (error) {
@@ -153,7 +150,6 @@ class AuthServiceClass {
     try {
       // 로그인 타입 확인
       const loginType = await this.getLoginType();
-      console.log('[Auth] Logout - Login type:', loginType);
 
       // Google 로그아웃
       if (loginType === 'google') {
@@ -164,31 +160,23 @@ class AuthServiceClass {
           // getCurrentUser로 현재 사용자 확인
           try {
             const currentUser = await GoogleSignin.getCurrentUser();
-            console.log('[Auth] Current Google user:', currentUser?.user?.email);
             
             if (currentUser) {
               // revokeAccess와 signOut을 순차적으로 시도
               try {
                 await GoogleSignin.revokeAccess();
-                console.log('[Auth] ✅ Google access revoked');
               } catch (revokeError) {
-                console.log('[Auth] Could not revoke access:', revokeError);
               }
               
               await GoogleSignin.signOut();
-              console.log('[Auth] ✅ Google sign out success');
             } else {
-              console.log('[Auth] No Google user currently signed in');
             }
           } catch (userError) {
-            console.log('[Auth] Could not get current user, attempting signOut anyway');
             
             // getCurrentUser가 실패해도 signOut 시도
             try {
               await GoogleSignin.signOut();
-              console.log('[Auth] ✅ Google sign out success (forced)');
             } catch (signOutError) {
-              console.log('[Auth] Google sign out error:', signOutError);
             }
           }
         } catch (googleError) {
@@ -208,7 +196,6 @@ class AuthServiceClass {
       // 온보딩 상태는 유지 (선택사항)
       // await AsyncStorage.removeItem('onboarding_complete');
 
-      console.log('[Auth] ✅ Logout complete - all local data cleared');
     } catch (error) {
       console.error('[Auth] ❌ Logout error:', error);
       
@@ -220,7 +207,6 @@ class AuthServiceClass {
           'userInfo',
           'guestSessionId', // ⭐ 게스트 세션 ID 추가
         ]);
-        console.log('[Auth] ✅ Local data cleared (fallback)');
       } catch (clearError) {
         console.error('[Auth] ❌ Critical: Failed to clear local data:', clearError);
         throw clearError;
@@ -282,7 +268,6 @@ class AuthServiceClass {
 
       // Google 토큰 갱신
       const tokens = await GoogleSignin.getTokens();
-      console.log('[Auth] ✅ Token refreshed');
       return true;
     } catch (error) {
       console.error('[Auth] ❌ Token refresh error:', error);
@@ -314,12 +299,10 @@ class AuthServiceClass {
         await this.initializeGoogleSignIn();
         await GoogleSignin.signOut();
       } catch (error) {
-        console.log('[Auth] Google signOut during clear:', error);
       }
 
       // 모든 AsyncStorage 데이터 삭제
       await AsyncStorage.clear();
-      console.log('[Auth] ✅ All data cleared');
     } catch (error) {
       console.error('[Auth] ❌ Clear data error:', error);
     }

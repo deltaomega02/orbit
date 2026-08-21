@@ -36,14 +36,12 @@ class CalendarService {
    */
   private async refreshAccessToken(): Promise<string | null> {
     try {
-      console.log('🔄 [CalendarService] 토큰 갱신 시작');
       
       // Google Sign-In에서 새 토큰 받기
       const tokens = await GoogleSignin.getTokens();
       
       if (tokens.accessToken) {
         await AsyncStorage.setItem('calendarToken', tokens.accessToken);
-        console.log('✅ [CalendarService] 토큰 갱신 완료');
         return tokens.accessToken;
       }
       
@@ -60,23 +58,19 @@ class CalendarService {
    */
   private async getAccessToken(): Promise<string | null> {
     try {
-      console.log('🔑 [CalendarService] 액세스 토큰 가져오기');
       
       // AsyncStorage에서 토큰 가져오기
       const token = await AsyncStorage.getItem('calendarToken');
       if (token) {
-        console.log('✅ [CalendarService] 저장된 토큰 사용');
         return token;
       }
 
-      console.log('⚠️ [CalendarService] 저장된 토큰 없음, 새로 발급');
       
       // 토큰이 없으면 새로 발급
       const tokens = await GoogleSignin.getTokens();
       
       if (tokens.accessToken) {
         await AsyncStorage.setItem('calendarToken', tokens.accessToken);
-        console.log('✅ [CalendarService] 새 토큰 저장 완료');
         return tokens.accessToken;
       }
 
@@ -93,7 +87,6 @@ class CalendarService {
    */
   async getTodayEvents(forceRefresh: boolean = false): Promise<CalendarEvent[] | CalendarError> {
     try {
-      console.log('📅 [CalendarService] 일정 조회 시작');
       
       // 게스트 계정 체크
       const userInfoString = await AsyncStorage.getItem('userInfo');
@@ -102,7 +95,6 @@ class CalendarService {
         const email = userInfo?.user?.email || '';
         
         if (email.endsWith('@orbit.guest')) {
-          console.log('🚪 [CalendarService] 게스트 계정 - 빈 배열 반환');
           return [];
         }
       }
@@ -111,7 +103,6 @@ class CalendarService {
       if (!forceRefresh) {
         const cached = await loadCalendarCache();
         if (cached && !isCacheExpired(cached.timestamp)) {
-          console.log('✅ [CalendarService] 캐시 사용');
           return cached.events.map(e => ({
             id: e.id,
             summary: e.title,
@@ -132,7 +123,6 @@ class CalendarService {
       // 실패 시 만료된 캐시라도 사용
       const staleCache = await loadCalendarCache();
       if (staleCache) {
-        console.log('⚠️ [CalendarService] 만료된 캐시 사용');
         return staleCache.events.map(e => ({
           id: e.id,
           summary: e.title,
@@ -168,7 +158,6 @@ class CalendarService {
       const startOfDay = new Date(today.setHours(0, 0, 0, 0)).toISOString();
       const endOfDay = new Date(today.setHours(23, 59, 59, 999)).toISOString();
 
-      console.log('📡 [CalendarService] API 호출');
       
       const url = `${CALENDAR_API_BASE}/calendars/primary/events`;
       const response = await axios.get(url, {
@@ -185,7 +174,6 @@ class CalendarService {
         timeout: 10000,
       });
 
-      console.log('✅ [CalendarService] API 성공, 일정:', response.data.items?.length || 0, '개');
 
       const events: CalendarEvent[] = response.data.items.map((item: any) => ({
         id: item.id,
@@ -226,7 +214,6 @@ class CalendarService {
         const newToken = await this.refreshAccessToken();
         
         if (newToken) {
-          console.log('🔄 [CalendarService] 재시도 중...');
           return await this.fetchEventsWithRetry(retryCount + 1);
         }
       }

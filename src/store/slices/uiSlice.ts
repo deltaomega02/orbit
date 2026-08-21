@@ -69,7 +69,6 @@ const uiSlice = createSlice({
     builder.addMatcher(
       (action) => action.type === 'RESET_ALL',
       () => {
-        console.log('🔄 [uiSlice] 상태 초기화');
         return initialState;
       }
     );

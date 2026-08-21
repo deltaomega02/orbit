@@ -57,7 +57,6 @@ export const useWeatherAndSchedule = (): UseWeatherAndScheduleReturn => {
         windSpeed: weatherCache.windSpeed || 0,
         location: weatherCache.location || '현재 위치',
       });
-      console.log('✅ [useWeatherAndSchedule] Redux 캐시 날씨 사용');
     }
   }, [weatherCache]);
 
@@ -71,7 +70,6 @@ export const useWeatherAndSchedule = (): UseWeatherAndScheduleReturn => {
         location: e.location,
         description: e.description,
       })));
-      console.log('✅ [useWeatherAndSchedule] Redux 캐시 일정 사용');
     }
   }, [calendarCache]);
 
@@ -79,7 +77,6 @@ export const useWeatherAndSchedule = (): UseWeatherAndScheduleReturn => {
    * 데이터 로드 (캐시 우선 + 백그라운드 업데이트)
    */
   const loadData = async (isInitial: boolean = false) => {
-    console.log('🔄 [useWeatherAndSchedule] 데이터 로드 시작');
     
     if (isInitial) {
       setIsLoading(true);
@@ -94,7 +91,6 @@ export const useWeatherAndSchedule = (): UseWeatherAndScheduleReturn => {
         loadEvents(),
       ]);
 
-      console.log('✅ [useWeatherAndSchedule] 데이터 업데이트 완료');
     } catch (err) {
       console.error('❌ [useWeatherAndSchedule] 데이터 로드 실패:', err);
       setError('데이터를 불러오는 중 오류가 발생했습니다');
@@ -119,7 +115,6 @@ export const useWeatherAndSchedule = (): UseWeatherAndScheduleReturn => {
         accuracy: Location.Accuracy.Balanced,
       });
 
-      console.log('📍 [useWeatherAndSchedule] 위치 획득:', location.coords);
 
       // forceRefresh = false: 캐시가 유효하면 캐시 사용, 만료되었으면 API 호출
       const weatherData = await weatherService.getWeatherByCoords(
@@ -130,7 +125,6 @@ export const useWeatherAndSchedule = (): UseWeatherAndScheduleReturn => {
 
       if (!('error' in weatherData)) {
         setWeather(weatherData);
-        console.log('✅ [useWeatherAndSchedule] 날씨 업데이트:', weatherData.temp + '°C');
       } else {
         console.error('❌ 날씨 로드 실패:', weatherData.message);
       }
@@ -149,7 +143,6 @@ export const useWeatherAndSchedule = (): UseWeatherAndScheduleReturn => {
 
       if (!('error' in eventsData)) {
         setEvents(eventsData);
-        console.log('✅ [useWeatherAndSchedule] 일정 업데이트:', eventsData.length + '개');
       } else {
         console.error('❌ 일정 로드 실패:', eventsData.message);
       }
@@ -162,7 +155,6 @@ export const useWeatherAndSchedule = (): UseWeatherAndScheduleReturn => {
    * 수동 새로고침 (강제 업데이트)
    */
   const refresh = async () => {
-    console.log('🔄 [useWeatherAndSchedule] 수동 새로고침');
     setIsRefreshing(true);
 
     try {
@@ -190,7 +182,6 @@ export const useWeatherAndSchedule = (): UseWeatherAndScheduleReturn => {
           setEvents(eventsData);
         }
 
-        console.log('✅ [useWeatherAndSchedule] 강제 새로고침 완료');
       }
     } catch (error) {
       console.error('❌ [useWeatherAndSchedule] 새로고침 실패:', error);

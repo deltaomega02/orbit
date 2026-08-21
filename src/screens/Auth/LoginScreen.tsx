@@ -113,16 +113,13 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
         });
         
         if (response.data.success) {
-          console.log('✅ 서버 로그인 성공:', response.data.message);
           
           // ⭐ 토큰 저장 추가
           if (response.data.token) {
             await AsyncStorage.setItem('auth_token', response.data.token);
-            console.log('✅ Google 토큰 저장 완료:', response.data.token.substring(0, 20) + '...');
           }
         }
       } catch (serverError: any) {
-        console.log('⚠️ 서버 연결 실패, 오프라인 모드로 진행');
       }
 
       // 로컬 저장
@@ -137,7 +134,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
       const tokens = await GoogleSignin.getTokens();
       await AsyncStorage.setItem('calendarToken', tokens.accessToken);
 
-      console.log('✅ Google 로그인 완료');
       navigation.replace('Main', undefined);
 
     } catch (error: any) {
@@ -163,7 +159,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
       setGuestModalVisible(false);
       setLoading(true);
 
-      console.log('🔑 게스트 로그인 시작');
 
       // ⭐ 1. AuthService로 게스트 계정 생성 (로컬)
       const guestUserInfo = await AuthService.createGuestAccount();
@@ -171,12 +166,9 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
       const guestEmail = guestUserInfo.user.email;
       const guestId = guestUserInfo.user.id;
       
-      console.log('🔑 게스트 계정 생성됨:', guestEmail);
-      console.log('🔑 게스트 ID:', guestId);
 
       // ⭐ 2. 서버에 게스트 계정 등록 및 토큰 받기
       try {
-        console.log('🔑 서버에 게스트 등록 시도...');
         const response = await axios.post(`${API_BASE_URL}/auth/google/`, {
           email: guestEmail,
           name: `Guest_${guestId}`,  // ⭐ 유니크한 이름 사용
@@ -186,7 +178,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
         if (response.data.success && response.data.token) {
           // ⭐ 3. 게스트 토큰 저장
           await AsyncStorage.setItem('auth_token', response.data.token);
-          console.log('✅ 게스트 토큰 저장 완료:', response.data.token.substring(0, 20) + '...');
         } else {
           console.warn('⚠️ 게스트 토큰을 받지 못함');
         }
@@ -200,13 +191,11 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
           name: 'Guest User',
           google_id: guestId,
         }, null, 2));
-        console.log('⚠️ 로컬 전용 게스트 모드로 진행 (토큰 없음)');
       }
 
       // 4. isFirstLogin 설정
       await AsyncStorage.setItem('isFirstLogin', 'true');
 
-      console.log('✅ Guest Mode Activated');
       navigation.replace('Main', undefined);
 
     } catch (error) {

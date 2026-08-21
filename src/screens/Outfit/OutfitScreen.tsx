@@ -91,7 +91,6 @@ const OutfitScreen: React.FC = () => {
     const fetchOutfitHistory = async () => {
         setIsLoading(true);
         try {
-            console.log('📄 코디 히스토리 불러오기 시작');
             const response = await API.coordinations.list();
             
             let rawList: any[] = [];
@@ -103,7 +102,6 @@ const OutfitScreen: React.FC = () => {
                 rawList = response.data.coordinations;
             }
 
-            console.log(`📊 받아온 코디 개수: ${rawList.length}개`);
             
             if (rawList.length > 0) {
                 // 서버 데이터를 OutfitRecord 형식으로 변환
@@ -144,7 +142,6 @@ const OutfitScreen: React.FC = () => {
                 // 최신순 정렬
                 mappedHistory.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
                 setOutfitHistory(mappedHistory);
-                console.log('✅ 코디 히스토리 로드 완료');
             }
         } catch (error) {
             console.error('❌ 코디 히스토리 불러오기 실패:', error);
@@ -171,7 +168,6 @@ const OutfitScreen: React.FC = () => {
         );
 
         try {
-            console.log('💖 즐겨찾기 토글 API 호출:', outfitId);
             const response = await API.coordinations.toggleFavorite(parseInt(outfitId));
             
             // 서버 응답으로 상태 확정
@@ -183,7 +179,6 @@ const OutfitScreen: React.FC = () => {
                             : outfit
                     )
                 );
-                console.log('✅ 즐겨찾기 상태 서버 저장 완료:', response.data.is_favorite);
             }
         } catch (error) {
             // 에러 시 이전 상태로 롤백

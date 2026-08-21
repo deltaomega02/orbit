@@ -141,7 +141,6 @@ export const RecommendScreen: React.FC<RecommendScreenProps> = ({ navigation }) 
       const savedPreference = await loadStylePreference();
       if (savedPreference) {
         setStylePreference(savedPreference);
-        console.log('✅ 스타일 프리퍼런스 로드됨:', savedPreference);
       }
     };
     loadPreference();
@@ -162,7 +161,6 @@ export const RecommendScreen: React.FC<RecommendScreenProps> = ({ navigation }) 
   const fetchHistoryFromServer = async () => {
     setIsLoadingHistory(true);
     try {
-      console.log('📄 서버 요청 시작: API.coordinations.list()');
       
       const response = await API.coordinations.list();
       
@@ -296,7 +294,6 @@ export const RecommendScreen: React.FC<RecommendScreenProps> = ({ navigation }) 
 
   // ★ 백그라운드에서 이미지 생성 시작
   const startImageGeneration = async (coordinationId: string, card: RecommendationCard) => {
-    console.log('🎨 이미지 생성 시작:', coordinationId);
     
     // 이미지 생성 상태 업데이트
     setImageGenerationStatus(prev => {
@@ -309,10 +306,8 @@ export const RecommendScreen: React.FC<RecommendScreenProps> = ({ navigation }) 
       const response = await API.coordinations.generateVirtualTryOn(parseInt(coordinationId, 10));
       
       if (response.data.success && response.data.image_url) {
-        console.log('✅ 이미지 생성 완료:', response.data.image_url);
         
         // ★ 이미지를 캐시에 미리 저장 (expo-image는 자동 캐싱)
-        console.log('💾 이미지 자동 캐싱');
         
         setImageGenerationStatus(prev => {
           const newMap = new Map(prev);
@@ -680,7 +675,6 @@ export const RecommendScreen: React.FC<RecommendScreenProps> = ({ navigation }) 
     const success = await saveStylePreference(preference);
     if (success) {
       setStylePreference(preference);
-      console.log('✅ 스타일 프리퍼런스 저장됨:', preference);
     } else {
       Alert.alert('저장 실패', '스타일 선호도를 저장하는 중 오류가 발생했습니다.');
     }
@@ -691,7 +685,6 @@ export const RecommendScreen: React.FC<RecommendScreenProps> = ({ navigation }) 
     const success = await clearStylePreference();
     if (success) {
       setStylePreference('');
-      console.log('🗑️ 스타일 프리퍼런스 삭제됨');
     }
   };
 
@@ -734,7 +727,6 @@ export const RecommendScreen: React.FC<RecommendScreenProps> = ({ navigation }) 
         isFavorite = response.data.is_favorite;
       }
     } catch (error) {
-      console.log('즐겨찾기 상태 조회 실패, 기본값 false 사용');
     }
     
     navigation.navigate('VirtualTryOn', { 

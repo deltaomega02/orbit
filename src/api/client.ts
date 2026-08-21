@@ -35,7 +35,6 @@ apiClient.interceptors.request.use(
     }
     
     // 로깅 (개발용)
-    console.log('[API Request]', config.method?.toUpperCase(), config.url);
     
     return config;
   },
@@ -49,7 +48,6 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response) => {
     // 로깅 (개발용)
-    console.log('[API Response]', response.config.url, response.status);
     return response;
   },
   async (error: AxiosError) => {
@@ -59,14 +57,12 @@ apiClient.interceptors.response.use(
       switch (error.response.status) {
         case 401:
           // 인증 실패: 토큰 만료 또는 무효
-          console.log('[API] 인증 실패 - 재로그인 필요');
           await AsyncStorage.removeItem('auth_token');
           break;
         case 403:
           Alert.alert('권한 없음', '이 작업을 수행할 권한이 없습니다.');
           break;
         case 404:
-          console.log('[API] 리소스를 찾을 수 없음');
           break;
         case 500:
           Alert.alert('서버 오류', '서버에 문제가 발생했습니다. 잠시 후 다시 시도해주세요.');
@@ -265,8 +261,6 @@ export const API = {
     create: (data: FormData | any) => {
       const isFormData = data instanceof FormData;
       
-      console.log('[API] clothes.create 호출');
-      console.log('[API] FormData 여부:', isFormData);
       
       return apiClient.post('/accounts/clothes/', data, {
         headers: isFormData ? {
@@ -292,7 +286,6 @@ export const API = {
     
     // ⭐ 부분 수정용 PATCH 메서드 (이름, 서브카테고리 등 일부만 수정할 때 사용)
     patch: (id: number, data: any) => {
-      console.log('[API] clothes.patch 호출 - 부분 수정');
       return apiClient.patch(`/accounts/clothes/${id}/`, data, {
         headers: {
           'Content-Type': 'application/json',
@@ -306,7 +299,6 @@ export const API = {
     
     // Gemini AI 분석
     analyzeWithAI: (formData: FormData) => {
-      console.log('[API] Gemini AI 분석 요청 시작');
       return apiClient.post<AIAnalysisResponse>(
         '/accounts/clothes/analyze/',
         formData,
@@ -328,7 +320,6 @@ export const API = {
      * @returns 추천된 코디 정보
      */
     recommend: (data: OutfitRecommendationRequest) => {
-      console.log('[API] 코디 추천 요청:', data.recommendation_type);
       return apiClient.post<OutfitRecommendationResponse>(
         '/accounts/outfit/recommend/',
         data,
@@ -372,7 +363,6 @@ export const API = {
      * @returns 코디네이션 상세 정보 (가상 착용 이미지 URL 포함)
      */
     get: (id: number) => {
-      console.log('[API] 코디네이션 상세 조회:', id);
       return apiClient.get<CoordinationDetailResponse>(`/accounts/coordinations/${id}/`);
     },
     
@@ -411,7 +401,6 @@ export const API = {
      * @returns 생성된 이미지 URL
      */
     generateVirtualTryOn: (coordinationId: number) => {
-      console.log('[API] 가상 착용 이미지 생성 요청:', coordinationId);
       return apiClient.post<VirtualTryOnGenerationResponse>(
         `/accounts/coordinations/${coordinationId}/generate-tryon/`,
         {},

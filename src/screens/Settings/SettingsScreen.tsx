@@ -118,7 +118,6 @@ const SettingsScreen: React.FC = () => {
       const response = await API.user.getProfile();
       const userData = response.data;
 
-      console.log('[Settings] 프로필 로드:', userData);
 
       // 성별
       if (userData.sex) {
@@ -187,9 +186,7 @@ const SettingsScreen: React.FC = () => {
           type: 'image/jpeg',
         } as any);
 
-        console.log('[Settings] 전신 사진 포함하여 저장');
         const response = await API.user.updateProfileWithPhoto(formData);
-        console.log('[Settings] 저장 성공:', response.data);
       } else {
         // 사진 없이 JSON으로 저장
         const response = await API.user.updateProfile({
@@ -197,7 +194,6 @@ const SettingsScreen: React.FC = () => {
           height: heightNum,
           weight: weightNum,
         });
-        console.log('[Settings] 저장 성공:', response.data);
       }
 
       // ⭐ Alert 대신 모달 표시
@@ -255,7 +251,6 @@ const SettingsScreen: React.FC = () => {
       });
 
       if (!result.canceled && result.assets[0]) {
-        console.log('[Settings] 앨범에서 전신사진 선택:', result.assets[0].uri);
         setBodyPhotoUri(result.assets[0].uri);
         setHasChanges(true);
       }
@@ -286,7 +281,6 @@ const SettingsScreen: React.FC = () => {
       });
 
       if (!result.canceled && result.assets[0]) {
-        console.log('[Settings] 카메라로 전신사진 촬영:', result.assets[0].uri);
         setBodyPhotoUri(result.assets[0].uri);
         setHasChanges(true);
       }
@@ -328,7 +322,6 @@ const SettingsScreen: React.FC = () => {
       setLogoutModalVisible(false);
       setIsLoading(true);
 
-      console.log('🚪 로그아웃 시작');
 
       // ⭐ 1. 게스트 계정이면 서버에서 삭제
       const loginType = await AsyncStorage.getItem('loginType');
@@ -336,13 +329,11 @@ const SettingsScreen: React.FC = () => {
       
       if (loginType === 'guest' && token) {
         try {
-          console.log('🗑️ 게스트 계정 삭제 요청...');
           await axios.delete('http://YOUR_SERVER_IP:8000/api/accounts/auth/guest/', {
             headers: {
               Authorization: `Token ${token}`,
             },
           });
-          console.log('✅ 게스트 계정 서버에서 삭제 완료');
         } catch (deleteError: any) {
           console.error('⚠️ 게스트 계정 삭제 실패:', deleteError.response?.data || deleteError.message);
           // 삭제 실패해도 로그아웃은 계속 진행
@@ -354,7 +345,6 @@ const SettingsScreen: React.FC = () => {
 
       // 3. ⭐ Redux Store 전체 초기화 (의류, 의상 등 모든 데이터 제거)
       store.dispatch({ type: 'RESET_ALL' });
-      console.log('✅ Redux Store 초기화 완료');
 
       // 4. 네비게이션 스택 초기화하고 로그인 화면으로 이동
       navigation.reset({
@@ -362,7 +352,6 @@ const SettingsScreen: React.FC = () => {
         routes: [{ name: 'Login' }],
       });
 
-      console.log('✅ 로그아웃 완료');
 
     } catch (error) {
       console.error('Logout error:', error);

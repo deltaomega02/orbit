@@ -29,7 +29,6 @@ export const fetchWeather = createAsyncThunk(
   'weather/fetchWeather',
   async (_, { rejectWithValue }) => {
     try {
-      console.log('🌤️ [Redux] 날씨 데이터 로드 시작');
       
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
@@ -49,7 +48,6 @@ export const fetchWeather = createAsyncThunk(
         throw new Error(weatherData.message);
       }
 
-      console.log('✅ [Redux] 날씨 데이터 로드 성공');
       return weatherData;
     } catch (error: any) {
       console.error('❌ [Redux] 날씨 데이터 로드 실패:', error);
@@ -65,7 +63,6 @@ export const fetchEvents = createAsyncThunk(
   'weather/fetchEvents',
   async (forceRefresh: boolean = true, { rejectWithValue }) => {
     try {
-      console.log('📅 [Redux] 일정 데이터 로드 시작');
       
       const eventsData = await calendarService.getTodayEvents(forceRefresh);
 
@@ -73,7 +70,6 @@ export const fetchEvents = createAsyncThunk(
         throw new Error(eventsData.message);
       }
 
-      console.log('✅ [Redux] 일정 데이터 로드 성공:', eventsData.length + '개');
       return eventsData;
     } catch (error: any) {
       console.error('❌ [Redux] 일정 데이터 로드 실패:', error);
@@ -88,7 +84,6 @@ export const fetchEvents = createAsyncThunk(
 export const fetchWeatherAndEvents = createAsyncThunk(
   'weather/fetchWeatherAndEvents',
   async ({ isGuest }: { isGuest: boolean }, { dispatch }) => {
-    console.log('🔄 [Redux] 날씨 + 일정 동시 로드 시작');
     
     // 날씨는 항상 로드
     await dispatch(fetchWeather());
@@ -98,7 +93,6 @@ export const fetchWeatherAndEvents = createAsyncThunk(
       await dispatch(fetchEvents(true));
     }
     
-    console.log('✅ [Redux] 날씨 + 일정 동시 로드 완료');
   }
 );
 

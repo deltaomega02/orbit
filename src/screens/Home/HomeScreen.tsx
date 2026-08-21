@@ -62,7 +62,6 @@ const HomeScreen: React.FC = () => {
   const fetchOutfits = async () => {
     setIsLoading(true);
     try {
-      console.log('🏠 HomeScreen: 코디 데이터 불러오기 시작');
       const response = await API.coordinations.list();
       
       let rawList: any[] = [];
@@ -75,7 +74,6 @@ const HomeScreen: React.FC = () => {
       }
 
       if (rawList.length > 0) {
-        console.log(`📦 받아온 전체 코디 개수: ${rawList.length}개`);
         
         const today = new Date();
         today.setHours(0, 0, 0, 0);
@@ -91,7 +89,6 @@ const HomeScreen: React.FC = () => {
           const nextDate = new Date(targetDate);
           nextDate.setDate(nextDate.getDate() + 1);
           
-          console.log(`🔍 ${daysAgo === 0 ? '오늘' : `${daysAgo}일 전`} 코디 검색 중...`);
           
           foundOutfits = rawList.filter((item: any) => {
             if (!item.created_at) return false;
@@ -100,7 +97,6 @@ const HomeScreen: React.FC = () => {
           });
           
           if (foundOutfits.length > 0) {
-            console.log(`✅ ${daysAgo === 0 ? '오늘' : `${daysAgo}일 전`} 코디 발견: ${foundOutfits.length}개`);
             break;
           }
           
@@ -140,11 +136,9 @@ const HomeScreen: React.FC = () => {
           
           setOutfits(mappedOutfits);
         } else {
-          console.log('⚠️ 최근 7일 내 코디가 없습니다');
           setOutfits([]);
         }
       } else {
-        console.log('⚠️ 코디 데이터가 없습니다');
         setOutfits([]);
       }
     } catch (error) {

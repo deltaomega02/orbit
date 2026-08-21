@@ -2,9 +2,12 @@
 // 캐시 없이 매번 실시간 날씨/위치 조회 (한국어 지명 유지)
 
 import axios from 'axios';
+import { Config } from '../../constants/config';
 
-// OpenWeatherMap API 키
-const WEATHER_API_KEY = 'YOUR_OPENWEATHER_API_KEY';
+// OpenWeatherMap API 키 — 환경변수(WEATHER_API_KEY)에서 읽는다.
+// 예전에는 여기에 문자열을 직접 적었는데, 같은 키를 config.ts 도 들고 있어
+// 어느 쪽이 실제로 쓰이는지 알 수 없었다. config 하나로 모은다.
+const WEATHER_API_KEY = Config.WEATHER_API_KEY;
 
 // URL 상수
 const WEATHER_BASE_URL = 'https://api.openweathermap.org/data/2.5';
@@ -34,9 +37,6 @@ class WeatherService {
     latitude: number,
     longitude: number
   ): Promise<WeatherData | WeatherError> {
-    console.log('\n========== 🌤️ 날씨 서비스 시작 (No Cache) ==========');
-    console.log('🌐 [API] OpenWeatherMap 요청 시작 (항상 새로고침)...');
-    console.log(`   - 좌표: ${latitude}, ${longitude}`);
     
     try {
       // 날씨 API + 지명 변환 API 병렬 요청
@@ -69,7 +69,6 @@ class WeatherService {
       const weatherDataRaw = weatherResponse.data;
       
       // 👇 [디버깅] 원본 이름 확인
-      console.log(`📦 [API] 원본 날씨 데이터 내 지역명: "${weatherDataRaw.name}"`);
       
       // 👇 [핵심] 한국어 지명 추출 및 확인
       let finalLocationName = weatherDataRaw.name || 'Unknown';
@@ -82,15 +81,11 @@ class WeatherService {
         
         if (geoData.local_names && geoData.local_names.ko) {
           finalLocationName = geoData.local_names.ko;
-          console.log(`🇰🇷 [성공] 한국어 지명 발견! -> "${finalLocationName}"`);
         } else {
-          console.log('⚠️ [주의] 한국어(ko) 지명 데이터가 없습니다. 영어 이름을 사용합니다.');
         }
       } else {
-        console.log('⚠️ [주의] Geocoding API 응답이 비어있습니다.');
       }
 
-      console.log(`✅ [최종 적용] 위치 이름: "${finalLocationName}"`);
 
       // 최종 데이터 객체 생성
       const weatherData: WeatherData = {
@@ -103,8 +98,6 @@ class WeatherService {
         location: finalLocationName, // 한국어 지명 적용
       };
       
-      console.log('✅ [Complete] API 데이터 반환 완료');
-      console.log('=======================================\n');
       
       return weatherData;
 

@@ -79,7 +79,6 @@ const cacheSlice = createSlice({
     builder.addMatcher(
       (action) => action.type === 'RESET_ALL',
       () => {
-        console.log('🔄 [cacheSlice] 상태 초기화');
         return initialState;
       }
     );

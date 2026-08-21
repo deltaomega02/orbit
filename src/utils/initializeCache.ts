@@ -11,7 +11,6 @@ import { loadWeatherCache, loadCalendarCache } from './cacheManager';
  */
 export const initializeCache = async (): Promise<void> => {
   try {
-    console.log('🔄 [InitCache] 캐시 초기화 시작...');
 
     // 병렬로 날씨와 일정 캐시 로드
     const [weatherCache, calendarCache] = await Promise.all([
@@ -28,15 +27,11 @@ export const initializeCache = async (): Promise<void> => {
     );
 
     if (weatherCache || calendarCache) {
-      console.log('✅ [InitCache] 캐시 복원 완료');
       if (weatherCache) {
-        console.log('   - 날씨: ✓');
       }
       if (calendarCache) {
-        console.log('   - 일정: ✓ (' + calendarCache.events.length + '개)');
       }
     } else {
-      console.log('ℹ️ [InitCache] 복원할 캐시 없음');
     }
   } catch (error) {
     console.error('❌ [InitCache] 캐시 초기화 실패:', error);

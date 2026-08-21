@@ -65,7 +65,6 @@ const outfitSlice = createSlice({
     builder.addMatcher(
       (action) => action.type === 'RESET_ALL',
       () => {
-        console.log('🔄 [outfitSlice] 상태 초기화');
         return initialState;
       }
     );
