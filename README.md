@@ -67,7 +67,7 @@ AI 기반 패션 코디네이션 및 가상 착용 시뮬레이터를 제공하�
 ### Backend
 
 **Language & Framework**
-- Python 3.9+
+- Python 3.10+ (Django 5.2 요구사항)
 - Django 5.2
 - Django REST Framework
 
@@ -281,7 +281,7 @@ erDiagram
 - iOS Simulator (for macOS) or Android Emulator
 
 **Backend**
-- Python 3.9 or higher
+- Python 3.10 or higher (required by Django 5.2)
 - MySQL 8.0
 - pip 21.x or higher
 
@@ -297,7 +297,7 @@ erDiagram
 **1. Clone Repository**
 
 ```bash
-git clone https://github.com/yourusername/orbit-app.git
+git clone https://github.com/deltaomega02/orbit.git
 cd orbit-app
 ```
 
@@ -341,7 +341,7 @@ echo "DB_NAME=orbit_db" > .env
 echo "DB_USER=orbit_admin" >> .env
 echo "DB_PASSWORD=<your-password>" >> .env
 echo "GEMINI_API_KEY=your_gemini_api_key_here" >> .env
-echo "SECRET_KEY=your_django_secret_key_here" >> .env
+echo "DJANGO_SECRET_KEY=your_django_secret_key_here" >> .env
 
 # Initialize database
 chmod +x reset_db.sh
@@ -562,4 +562,33 @@ orbit_backend/
 
 ---
 
-**Developed by**: Team. ΔΩ
+## 내가 한 것 / 팀이 한 것
+
+3인 팀의 팀장으로 진행했다. 기여 범위를 정확히 적어 둔다.
+
+| | 담당 |
+|---|---|
+| 박시우 (팀장) | 전체 아키텍처 설계, AI 파이프라인(Gemini 연동·프롬프트·이미지 생성 흐름) 구축, 서버 전반 |
+| 팀원 1 (Full-Stack) | **DB 저장·관리 로직과 클라이언트–서버 데이터 통신 흐름을 함께 구현** |
+| 팀원 2 (Frontend) | UI/UX 디테일 |
+
+"백엔드를 혼자 다 짰다"는 사실이 아니다. 결과보고서 slide 6 의 역할 분담과 같다.
+
+## 알려진 한계
+
+졸업작품이라 실서비스 기준으로는 빠진 것이 많다. 알고 남겨 둔 것들이다.
+
+- **인증이 약하다.** 서버는 이메일 기반 간이 토큰(`Authorization: Token <email>`)으로 사용자를
+  식별한다. 서명도 만료도 없다. simplejwt 는 설정만 되어 있고 실사용되지 않는다.
+  실서비스라면 서명·만료가 있는 JWT 나 DRF TokenAuth 로 교체해야 한다.
+- **비동기가 클라이언트 주도다.** 이미지 생성처럼 수십 초 걸리는 작업을 서버는 동기로 처리하고,
+  클라이언트가 폴링해서 대기 경험만 분리했다. 서버 측 작업 큐가 없다.
+- **배포가 개발 서버였다.** `manage.py runserver` 를 `nohup` 으로 띄워 운영했다.
+  WSGI/ASGI 서버(gunicorn·uvicorn)와 리버스 프록시가 없었다. 이 한계를 알고 나서
+  다음 프로젝트([orbit-local](https://github.com/deltaomega02/orbit-local))에서 배포 형태를 다시 잡았다.
+- **테스트가 없다.** 이것도 orbit-local 에서 237개를 채우며 갚았다.
+- 캐싱은 캘린더 일정에만 적용된다. 날씨는 매번 실시간 조회다.
+
+---
+
+**Developed by**: 3인 팀 · 팀장 박시우(ΔΩ)
